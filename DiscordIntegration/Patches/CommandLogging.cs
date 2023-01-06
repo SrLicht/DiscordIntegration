@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+
 namespace DiscordIntegration.Patches
 {
 #pragma warning disable SA1118
@@ -14,7 +16,6 @@ namespace DiscordIntegration.Patches
     using System.Reflection.Emit;
     using System.Threading.Tasks;
     using Dependency;
-    using Exiled.API.Features;
     using global::DiscordIntegration.API;
     using global::DiscordIntegration.API.Commands;
     using HarmonyLib;
@@ -58,7 +59,7 @@ namespace DiscordIntegration.Patches
 
             Player player = sender is RemoteAdmin.PlayerCommandSender playerCommandSender
                 ? Player.Get(playerCommandSender)
-                : Server.Host;
+                : Server.Instance;
             if (player == null || (!string.IsNullOrEmpty(player.UserId) && DiscordIntegration.Instance.Config.TrustedAdmins.Contains(player.UserId)))
                 return;
             if (DiscordIntegration.Instance.Config.EventsToLog.SendingRemoteAdminCommands)

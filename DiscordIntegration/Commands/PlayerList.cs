@@ -5,13 +5,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Windows.Input;
+using NWAPIPermissionSystem;
+using PluginAPI.Core;
+
 namespace DiscordIntegration.Commands
 {
     using System;
     using System.Text;
     using CommandSystem;
-    using Exiled.API.Features;
-    using Exiled.Permissions.Extensions;
     using NorthwoodLib.Pools;
     using static DiscordIntegration;
 
@@ -43,13 +45,13 @@ namespace DiscordIntegration.Commands
 
             StringBuilder message = StringBuilderPool.Shared.Rent();
 
-            if (Player.Dictionary.Count == 0)
+            if (Player.Count == 0)
             {
                 message.Append(Language.NoPlayersOnline);
             }
             else
             {
-                foreach (Player player in Player.List)
+                foreach (Player player in Player.GetPlayers())
                     message.Append(player.Nickname).Append(" - ").Append(player.UserId).AppendLine();
             }
 

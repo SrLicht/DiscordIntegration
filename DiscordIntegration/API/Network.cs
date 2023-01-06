@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+
 namespace DiscordIntegration.API
 {
     using System;
@@ -15,7 +17,6 @@ namespace DiscordIntegration.API
     using System.Threading;
     using System.Threading.Tasks;
     using API.EventArgs.Network;
-    using Exiled.API.Features;
 
     using global::DiscordIntegration.Dependency;
 
@@ -191,7 +192,7 @@ namespace DiscordIntegration.API
 
                     if (counter >= 50)
                     {
-                        Log.Warn($"{nameof(SendAsync)}: Connection timed out.");
+                        Log.Warning($"{nameof(SendAsync)}: Connection timed out.");
                         Dispose();
 
                         return;

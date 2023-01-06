@@ -5,18 +5,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+
 namespace DiscordIntegration.Patches
 {
 #pragma warning disable SA1118
 
-    using System;
     using System.Collections.Generic;
     using System.Reflection.Emit;
-
-    using Exiled.API.Features;
-
-    using global::DiscordIntegration.API;
-    using global::DiscordIntegration.Dependency;
+    using Dependency;
 
     using HarmonyLib;
 

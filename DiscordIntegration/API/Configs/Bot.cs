@@ -5,6 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PlayerRoles;
+using PluginAPI.Core;
+using UnityEngine;
+
 namespace DiscordIntegration.API.Configs
 {
     using System;
@@ -14,7 +18,6 @@ namespace DiscordIntegration.API.Configs
     using System.Threading.Tasks;
     using API.Commands;
     using Dependency;
-    using Exiled.API.Features;
     using Mirror;
     using static DiscordIntegration;
 
@@ -74,8 +77,8 @@ namespace DiscordIntegration.API.Configs
             {
                 try
                 {
-                    Log.Debug($"{nameof(UpdateActivity)}: Updating bot activity: {Player.Dictionary.Count}/{Instance.Slots}", Instance.Config.IsDebugEnabled);
-                    await Network.SendAsync(new RemoteCommand(ActionType.UpdateActivity, $"{Player.Dictionary.Count}/{Instance.Slots}"), cancellationToken);
+                    Log.Debug($"{nameof(UpdateActivity)}: Updating bot activity: {Player.Count}/{Instance.Slots}", Instance.Config.IsDebugEnabled);
+                    await Network.SendAsync(new RemoteCommand(ActionType.UpdateActivity, $"{Player.Count}/{Instance.Slots}"), cancellationToken);
                     await Task.Delay(TimeSpan.FromSeconds(Instance.Config.Bot.StatusUpdateInterval), cancellationToken);
                 }
                 catch (Exception)
@@ -106,12 +109,12 @@ namespace DiscordIntegration.API.Configs
 
                 try
                 {
-                    int aliveHumans = Player.List.Count(player => player.IsAlive && player.IsHuman);
-                    int aliveScps = Player.Get(Team.SCP).Count();
+                    int aliveHumans = Player.GetPlayers().Count(player => player.IsAlive && player.IsHuman);
+                    int aliveScps = Player.GetPlayers().Count(p => p.Role.GetTeam() == Team.SCPs);
 
-                    string warheadText = Warhead.IsDetonated ? Language.WarheadHasBeenDetonated : Warhead.IsInProgress ? Language.WarheadIsCountingToDetonation : Language.WarheadHasntBeenDetonated;
+                    string warheadText = Warhead.IsDetonated ? Language.WarheadHasBeenDetonated : Warhead.IsDetonationInProgress ? Language.WarheadIsCountingToDetonation : Language.WarheadHasntBeenDetonated;
 
-                    await Network.SendAsync(new RemoteCommand(ActionType.UpdateChannelActivity, $"{string.Format(Language.PlayersOnline, Player.Dictionary.Count, Instance.Slots)}. {string.Format(Language.RoundDuration, Round.ElapsedTime)}. {string.Format(Language.AliveHumans, aliveHumans)}. {string.Format(Language.AliveScps, aliveScps)}. {warheadText} IP: {Server.IpAddress}:{Server.Port} TPS: {Server.Tps}"), cancellationToken);
+                    await Network.SendAsync(new RemoteCommand(ActionType.UpdateChannelActivity, $"{string.Format(Language.PlayersOnline, Player.Count, Instance.Slots)}. {string.Format(Language.RoundDuration, Round.Duration)}. {string.Format(Language.AliveHumans, aliveHumans)}. {string.Format(Language.AliveScps, aliveScps)}. {warheadText} IP: {Server.ServerIpAddress}:{Server.Port} TPS: {Math.Round(1f / Time.smoothDeltaTime)}"), cancellationToken);
                 }
                 catch (Exception exception)
                 {

@@ -10,13 +10,11 @@ namespace DiscordIntegration
     using System.Collections.Generic;
     using System.ComponentModel;
     using API.Configs;
-    using Exiled.API.Enums;
-    using Exiled.API.Interfaces;
 
     /// <summary>
     /// Handles plugin configs.
     /// </summary>
-    public sealed class Config : IConfig
+    public sealed class Config
     {
         /// <summary>
         /// Gets or sets a value indicating whether the plugin is enabled or not.

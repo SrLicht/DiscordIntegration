@@ -5,11 +5,13 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+using PluginAPI.Helpers;
+
 namespace DiscordIntegration
 {
     using System;
     using System.IO;
-    using Exiled.API.Features;
     using Newtonsoft.Json;
     using static DiscordIntegration;
 
@@ -33,7 +35,7 @@ namespace DiscordIntegration
         /// <summary>
         /// Gets the language folder.
         /// </summary>
-        public static string Folder { get; } = Path.Combine(Paths.Plugins, Instance.Name, "Languages");
+        public static string Folder { get; } = Path.Combine(Paths.Plugins, "DiscordIntegration", "Languages");
 
         /// <summary>
         /// Gets the language fullpath.
@@ -153,6 +155,8 @@ namespace DiscordIntegration
         public string Scp106CreatedPortal { get; set; } = "{0} ({1}) [{2}] has created a portal.";
 
         public string Scp106Teleported { get; set; } = "{0} ({1}) [{2}] has teleported to a portal.";
+        
+        public string Scp106TeleportPlayer { get; set; } = "{0} ({1}) has teleported {2} ({3}) to pocked dimension";
 
         public string GainedExperience { get; set; } = "{0} ({1}) [{2}] has gained {3} XP ({4}).";
 
@@ -330,7 +334,7 @@ namespace DiscordIntegration
 
         private void Error(object sender, Newtonsoft.Json.Serialization.ErrorEventArgs ev)
         {
-            Log.Warn($"Translation not found for \"{ev.ErrorContext.Member}\" key, loading default one...");
+            Log.Warning($"Translation not found for \"{ev.ErrorContext.Member}\" key, loading default one...");
 
             ev.ErrorContext.Handled = true;
         }

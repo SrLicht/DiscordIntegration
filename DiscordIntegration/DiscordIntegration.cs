@@ -6,6 +6,8 @@
 // -----------------------------------------------------------------------
 
 using DiscordIntegration.Dependency.Database;
+using PluginAPI.Core;
+using PluginAPI.Core.Attributes;
 
 namespace DiscordIntegration
 {
@@ -16,16 +18,14 @@ namespace DiscordIntegration
     using API.Configs;
     using API.User;
     using Events;
-    using Exiled.API.Features;
     using HarmonyLib;
     using MEC;
-    using Handlers = Exiled.Events.Handlers;
     using Version = System.Version;
 
     /// <summary>
     /// Link a Discord server with an SCP: SL server.
     /// </summary>
-    public class DiscordIntegration : Plugin<Config>
+    public class DiscordIntegration
     {
         private static readonly DiscordIntegration InstanceValue = new ();
 
@@ -72,21 +72,20 @@ namespace DiscordIntegration
         {
             get
             {
-                if (Server.MaxPlayerCount > 0)
-                    slots = Server.MaxPlayerCount;
+                if (Server.MaxPlayers > 0)
+                    slots = Server.MaxPlayers;
                 return slots;
             }
         }
 
-        /// <summary>
-        /// Gets the minimum version of Exiled to make the plugin work correctly.
-        /// </summary>
-        public override Version RequiredExiledVersion { get; } = new Version(5, 2, 0);
 
+        [PluginConfig] public Config Config;
         /// <summary>
         /// Fired when the plugin is enabled.
         /// </summary>
-        public override void OnEnabled()
+        [PluginEntryPoint("DiscordIntegration", "1.0.0", 
+            "server plugin to allow server logs to be sent to Discord channels, and for server commands to be run via the Discord bot.", "SrLicht")]
+        public void OnEnabled()
         {
             try
             {
@@ -95,7 +94,7 @@ namespace DiscordIntegration
             }
             catch (Exception e)
             {
-                Log.Error(e);
+                Log.Error($"{e}");
             }
 
             Language = new Language();
@@ -117,14 +116,13 @@ namespace DiscordIntegration
 
             _ = Bot.UpdateActivity(Bot.UpdateActivityCancellationTokenSource.Token);
             _ = Bot.UpdateChannelsTopic(Bot.UpdateChannelsTopicCancellationTokenSource.Token);
-
-            base.OnEnabled();
         }
 
         /// <summary>
         /// Fired when the plugin is disabled.
         /// </summary>
-        public override void OnDisabled()
+        [PluginUnload]
+        public void OnDisabled()
         {
             harmony?.UnpatchAll(harmony.Id);
             harmony = null;
@@ -144,8 +142,6 @@ namespace DiscordIntegration
 
             Language = null;
             Network = null;
-
-            base.OnDisabled();
         }
 
         private void RegisterEvents()
@@ -154,58 +150,6 @@ namespace DiscordIntegration
             serverHandler = new ServerHandler();
             playerHandler = new PlayerHandler();
             networkHandler = new NetworkHandler();
-
-            Handlers.Map.Decontaminating += mapHandler.OnDecontaminating;
-            Handlers.Map.GeneratorActivated += mapHandler.OnGeneratorActivated;
-            Handlers.Warhead.Starting += mapHandler.OnStartingWarhead;
-            Handlers.Warhead.Stopping += mapHandler.OnStoppingWarhead;
-            Handlers.Warhead.Detonated += mapHandler.OnWarheadDetonated;
-            Handlers.Scp914.UpgradingItem += mapHandler.OnUpgradingItems;
-
-            Handlers.Server.WaitingForPlayers += serverHandler.OnWaitingForPlayers;
-            Handlers.Server.RoundStarted += serverHandler.OnRoundStarted;
-            Handlers.Server.RoundEnded += serverHandler.OnRoundEnded;
-            Handlers.Server.RespawningTeam += serverHandler.OnRespawningTeam;
-            Handlers.Server.ReportingCheater += serverHandler.OnReportingCheater;
-            Handlers.Server.LocalReporting += serverHandler.OnLocalReporting;
-
-            Handlers.Scp914.ChangingKnobSetting += playerHandler.OnChangingScp914KnobSetting;
-            Handlers.Player.UsedItem += playerHandler.OnUsedMedicalItem;
-            Handlers.Scp079.InteractingTesla += playerHandler.OnInteractingTesla;
-            Handlers.Player.PickingUpItem += playerHandler.OnPickingUpItem;
-            Handlers.Player.ActivatingGenerator += playerHandler.OnInsertingGeneratorTablet;
-            Handlers.Player.StoppingGenerator += playerHandler.OnEjectingGeneratorTablet;
-            Handlers.Player.UnlockingGenerator += playerHandler.OnUnlockingGenerator;
-            Handlers.Player.OpeningGenerator += playerHandler.OnOpeningGenerator;
-            Handlers.Player.ClosingGenerator += playerHandler.OnClosingGenerator;
-            Handlers.Scp079.GainingLevel += playerHandler.OnGainingLevel;
-            Handlers.Scp079.GainingExperience += playerHandler.OnGainingExperience;
-            Handlers.Player.EscapingPocketDimension += playerHandler.OnEscapingPocketDimension;
-            Handlers.Player.EnteringPocketDimension += playerHandler.OnEnteringPocketDimension;
-            Handlers.Scp106.CreatingPortal += playerHandler.OnCreatingPortal;
-            Handlers.Player.ActivatingWarheadPanel += playerHandler.OnActivatingWarheadPanel;
-            Handlers.Player.TriggeringTesla += playerHandler.OnTriggeringTesla;
-            Handlers.Player.ThrowingItem += playerHandler.OnThrowingGrenade;
-            Handlers.Player.Hurting += playerHandler.OnHurting;
-            Handlers.Player.Dying += playerHandler.OnDying;
-            Handlers.Player.Kicked += playerHandler.OnKicked;
-            Handlers.Player.Banned += playerHandler.OnBanned;
-            Handlers.Player.InteractingDoor += playerHandler.OnInteractingDoor;
-            Handlers.Player.InteractingElevator += playerHandler.OnInteractingElevator;
-            Handlers.Player.InteractingLocker += playerHandler.OnInteractingLocker;
-            Handlers.Player.IntercomSpeaking += playerHandler.OnIntercomSpeaking;
-            Handlers.Player.Handcuffing += playerHandler.OnHandcuffing;
-            Handlers.Player.RemovingHandcuffs += playerHandler.OnRemovingHandcuffs;
-            Handlers.Scp106.Teleporting += playerHandler.OnTeleporting;
-            Handlers.Player.ReloadingWeapon += playerHandler.OnReloadingWeapon;
-            Handlers.Player.DroppingItem += playerHandler.OnItemDropped;
-            Handlers.Player.Verified += playerHandler.OnVerified;
-            Handlers.Player.Destroying += playerHandler.OnDestroying;
-            Handlers.Player.ChangingRole += playerHandler.OnChangingRole;
-            Handlers.Player.ChangingGroup += playerHandler.OnChangingGroup;
-            Handlers.Player.ChangingItem += playerHandler.OnChangingItem;
-            Handlers.Scp914.Activating += playerHandler.OnActivatingScp914;
-            Handlers.Scp106.Containing += playerHandler.OnContaining;
 
             Network.SendingError += networkHandler.OnSendingError;
             Network.ReceivingError += networkHandler.OnReceivingError;
@@ -220,58 +164,6 @@ namespace DiscordIntegration
 
         private void UnregisterEvents()
         {
-            Handlers.Map.Decontaminating -= mapHandler.OnDecontaminating;
-            Handlers.Map.GeneratorActivated -= mapHandler.OnGeneratorActivated;
-            Handlers.Warhead.Starting -= mapHandler.OnStartingWarhead;
-            Handlers.Warhead.Stopping -= mapHandler.OnStoppingWarhead;
-            Handlers.Warhead.Detonated -= mapHandler.OnWarheadDetonated;
-            Handlers.Scp914.UpgradingItem -= mapHandler.OnUpgradingItems;
-
-            Handlers.Server.WaitingForPlayers -= serverHandler.OnWaitingForPlayers;
-            Handlers.Server.RoundStarted -= serverHandler.OnRoundStarted;
-            Handlers.Server.RoundEnded -= serverHandler.OnRoundEnded;
-            Handlers.Server.RespawningTeam -= serverHandler.OnRespawningTeam;
-            Handlers.Server.ReportingCheater -= serverHandler.OnReportingCheater;
-            Handlers.Server.LocalReporting -= serverHandler.OnLocalReporting;
-
-            Handlers.Scp914.ChangingKnobSetting -= playerHandler.OnChangingScp914KnobSetting;
-            Handlers.Player.UsedItem -= playerHandler.OnUsedMedicalItem;
-            Handlers.Scp079.InteractingTesla -= playerHandler.OnInteractingTesla;
-            Handlers.Player.PickingUpItem -= playerHandler.OnPickingUpItem;
-            Handlers.Player.ActivatingGenerator -= playerHandler.OnInsertingGeneratorTablet;
-            Handlers.Player.StoppingGenerator -= playerHandler.OnEjectingGeneratorTablet;
-            Handlers.Player.UnlockingGenerator -= playerHandler.OnUnlockingGenerator;
-            Handlers.Player.OpeningGenerator -= playerHandler.OnOpeningGenerator;
-            Handlers.Player.ClosingGenerator -= playerHandler.OnClosingGenerator;
-            Handlers.Scp079.GainingLevel -= playerHandler.OnGainingLevel;
-            Handlers.Scp079.GainingExperience -= playerHandler.OnGainingExperience;
-            Handlers.Player.EscapingPocketDimension -= playerHandler.OnEscapingPocketDimension;
-            Handlers.Player.EnteringPocketDimension -= playerHandler.OnEnteringPocketDimension;
-            Handlers.Scp106.CreatingPortal -= playerHandler.OnCreatingPortal;
-            Handlers.Player.ActivatingWarheadPanel -= playerHandler.OnActivatingWarheadPanel;
-            Handlers.Player.TriggeringTesla -= playerHandler.OnTriggeringTesla;
-            Handlers.Player.ThrowingItem -= playerHandler.OnThrowingGrenade;
-            Handlers.Player.Hurting -= playerHandler.OnHurting;
-            Handlers.Player.Dying -= playerHandler.OnDying;
-            Handlers.Player.Kicked -= playerHandler.OnKicked;
-            Handlers.Player.Banned -= playerHandler.OnBanned;
-            Handlers.Player.InteractingDoor -= playerHandler.OnInteractingDoor;
-            Handlers.Player.InteractingElevator -= playerHandler.OnInteractingElevator;
-            Handlers.Player.InteractingLocker -= playerHandler.OnInteractingLocker;
-            Handlers.Player.IntercomSpeaking -= playerHandler.OnIntercomSpeaking;
-            Handlers.Player.Handcuffing -= playerHandler.OnHandcuffing;
-            Handlers.Player.RemovingHandcuffs -= playerHandler.OnRemovingHandcuffs;
-            Handlers.Scp106.Teleporting -= playerHandler.OnTeleporting;
-            Handlers.Player.ReloadingWeapon -= playerHandler.OnReloadingWeapon;
-            Handlers.Player.DroppingItem -= playerHandler.OnItemDropped;
-            Handlers.Player.Verified -= playerHandler.OnVerified;
-            Handlers.Player.Destroying -= playerHandler.OnDestroying;
-            Handlers.Player.ChangingRole -= playerHandler.OnChangingRole;
-            Handlers.Player.ChangingGroup -= playerHandler.OnChangingGroup;
-            Handlers.Player.ChangingItem -= playerHandler.OnChangingItem;
-            Handlers.Scp914.Activating -= playerHandler.OnActivatingScp914;
-            Handlers.Scp106.Containing -= playerHandler.OnContaining;
-
             Network.SendingError -= networkHandler.OnSendingError;
             Network.ReceivingError -= networkHandler.OnReceivingError;
             Network.UpdatingConnectionError -= networkHandler.OnUpdatingConnectionError;

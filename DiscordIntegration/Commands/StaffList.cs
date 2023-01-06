@@ -5,13 +5,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using NWAPIPermissionSystem;
+using PluginAPI.Core;
+
 namespace DiscordIntegration.Commands
 {
     using System;
     using System.Text;
     using CommandSystem;
-    using Exiled.API.Features;
-    using Exiled.Permissions.Extensions;
     using NorthwoodLib.Pools;
     using static DiscordIntegration;
 
@@ -35,6 +36,7 @@ namespace DiscordIntegration.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+
             if (!sender.CheckPermission("di.stafflist"))
             {
                 response = string.Format(Language.NotEnoughPermissions, "di.stafflist");
@@ -43,10 +45,15 @@ namespace DiscordIntegration.Commands
 
             StringBuilder message = StringBuilderPool.Shared.Rent();
 
-            foreach (Player player in Player.List)
+            foreach (Player player in Player.GetPlayers())
             {
                 if (player.RemoteAdminAccess)
-                    message.Append(player.Nickname).Append(" - ").Append(player?.GroupName).AppendLine();
+                {
+                    var groupname =
+                        ServerStatic.PermissionsHandler._members.TryGetValue(player.UserId, out string groupName);
+                    message.Append(player.Nickname).Append(" - ").Append(groupname ? groupName : "").AppendLine();
+                }
+                    
             }
 
             if (message.Length == 0)

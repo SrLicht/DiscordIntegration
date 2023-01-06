@@ -5,6 +5,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Numerics;
+using InventorySystem.Items;
+using InventorySystem.Items.Pickups;
+using MapGeneration;
+using MapGeneration.Distributors;
+using PluginAPI.Core;
+using PluginAPI.Core.Attributes;
+using PluginAPI.Core.Zones.Heavy;
+using PluginAPI.Enums;
+using Scp914;
+
 namespace DiscordIntegration.Events
 {
     using System;
@@ -13,9 +24,6 @@ namespace DiscordIntegration.Events
     using System.Text;
     using API.Commands;
     using Dependency;
-    using Exiled.API.Enums;
-    using Exiled.API.Features;
-    using Exiled.Events.EventArgs;
     using NorthwoodLib.Pools;
     using static DiscordIntegration;
 
@@ -24,64 +32,80 @@ namespace DiscordIntegration.Events
     /// </summary>
     internal sealed class MapHandler
     {
-#pragma warning disable SA1600 // Elements should be documented
+        [PluginEvent(ServerEventType.WarheadDetonation)]
         public async void OnWarheadDetonated()
         {
             if (Instance.Config.EventsToLog.WarheadDetonated)
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, Language.WarheadHasDetonated)).ConfigureAwait(false);
         }
 
-        public async void OnGeneratorActivated(GeneratorActivatedEventArgs ev)
+        [PluginEvent(ServerEventType.GeneratorActivated)]
+        public async void OnGeneratorActivated(Scp079Generator generator)
         {
             if (Instance.Config.EventsToLog.GeneratorActivated)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.GeneratorFinished, ev.Generator.Room, Generator.Get(GeneratorState.Engaged).Count() + 1))).ConfigureAwait(false);
+            {
+                var generatorRoom = RoomIdUtils.RoomAtPosition(generator.gameObject.transform.position);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.GeneratorFinished, generatorRoom.Name, Events.VeryHelpful.GeneratorCount++))).ConfigureAwait(false);
+            }
         }
-
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Discard operator")]
-        public async void OnDecontaminating(DecontaminatingEventArgs _)
+        
+        [PluginEvent(ServerEventType.LczDecontaminationStart)]
+        public async void OnDecontaminating()
         {
             if (Instance.Config.EventsToLog.Decontaminating)
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, Language.DecontaminationHasBegun)).ConfigureAwait(false);
         }
 
-        public async void OnStartingWarhead(StartingEventArgs ev)
+        [PluginEvent(ServerEventType.WarheadStart)]
+        public async void OnStartingWarhead(bool isAutomatic, Player ply, bool isResumed)
         {
-            if (Instance.Config.EventsToLog.StartingWarhead && (ev.Player == null || (ev.Player != null && (!ev.Player.DoNotTrack || !Instance.Config.ShouldRespectDoNotTrack))))
+            if (Instance.Config.EventsToLog.StartingWarhead && (ply == null || (ply != null && (ply.DoNotTrack || !Instance.Config.ShouldRespectDoNotTrack))))
             {
-                object[] vars = ev.Player == null ?
-                    new object[] { Warhead.DetonationTimer } :
-                    new object[] { ev.Player.Nickname, Instance.Config.ShouldLogUserIds ? ev.Player.UserId : Language.Redacted, ev.Player.Role, Warhead.DetonationTimer };
+                object[] vars = ply == null ?
+                    new object[] { Warhead.DetonationTime } :
+                    new object[] { ply.Nickname, Instance.Config.ShouldLogUserIds ? ply.UserId : Language.Redacted, ply.Role, Warhead.DetonationTime };
 
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ev.Player == null ? Language.WarheadStarted : Language.PlayerWarheadStarted, vars))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ply == null ? Language.WarheadStarted : Language.PlayerWarheadStarted, vars))).ConfigureAwait(false);
             }
         }
 
-        public async void OnStoppingWarhead(StoppingEventArgs ev)
+        [PluginEvent(ServerEventType.WarheadStop)]
+        public async void OnStoppingWarhead(Player ply)
         {
-            if (Instance.Config.EventsToLog.StoppingWarhead && (ev.Player == null || (ev.Player != null && (!ev.Player.DoNotTrack || !Instance.Config.ShouldRespectDoNotTrack))))
+            if (Instance.Config.EventsToLog.StoppingWarhead && (ply == null || (ply != null && (!ply.DoNotTrack || !Instance.Config.ShouldRespectDoNotTrack))))
             {
-                object[] vars = ev.Player == null ?
+                object[] vars = ply == null ?
                     Array.Empty<object>() :
-                    new object[] { ev.Player.Nickname, Instance.Config.ShouldLogUserIds ? ev.Player.UserId : Language.Redacted, ev.Player.Role };
+                    new object[] { ply.Nickname, Instance.Config.ShouldLogUserIds ? ply.UserId : Language.Redacted, ply.Role };
 
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ev.Player == null ? Language.CanceledWarhead : Language.PlayerCanceledWarhead, vars))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ply == null ? Language.CanceledWarhead : Language.PlayerCanceledWarhead, vars))).ConfigureAwait(false);
             }
 
             if (Instance.Config.StaffOnlyEventsToLog.StoppingWarhead)
             {
-                object[] vars = ev.Player == null
+                object[] vars = ply == null
                     ? Array.Empty<object>()
-                    : new object[] { ev.Player.Nickname, ev.Player.UserId, ev.Player.Role };
+                    : new object[] { ply.Nickname, ply.UserId, ply.Role };
 
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(ev.Player == null ? Language.CanceledWarhead : Language.PlayerCanceledWarhead, vars))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(ply == null ? Language.CanceledWarhead : Language.PlayerCanceledWarhead, vars))).ConfigureAwait(false);
             }
         }
 
-        public async void OnUpgradingItems(UpgradingItemEventArgs ev)
+        [PluginEvent(ServerEventType.Scp914UpgradeInventory)]
+        public async void OnUpgradingItemsInventory(Player ply, ItemBase item, Scp914KnobSetting knobSetting)
         {
             if (Instance.Config.EventsToLog.UpgradingScp914Items)
             {
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.Scp914ProcessedItem, ev.Item.Type)));
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.Scp914ProcessedItem, item.ItemTypeId)));
+            }
+        }
+        
+        [PluginEvent(ServerEventType.Scp914PickupUpgraded)]
+        public async void OnUpgradingItemsPickup(ItemPickupBase item, Vector3 outPosition, Scp914KnobSetting knobSetting)
+        {
+            if (Instance.Config.EventsToLog.UpgradingScp914Items)
+            {
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.Scp914ProcessedItem, item.NetworkInfo.ItemId)));
             }
         }
     }

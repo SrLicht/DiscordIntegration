@@ -5,9 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+
 namespace DiscordIntegration.API.Commands
 {
-    using Exiled.API.Features;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -53,9 +54,9 @@ namespace DiscordIntegration.API.Commands
         public override bool FullPermissions { get; }
 
         /// <inheritdoc/>
-        public override void Print(string text) => player.Sender.Print(text);
+        public override void Print(string text) => player.ReferenceHub.queryProcessor._sender.Print(text);
 
         /// <inheritdoc/>
-        public override void RaReply(string text, bool success, bool logToConsole, string overrideDisplay) => player.Sender.RaReply($"DISCORDINTEGRATION#{text}", success, logToConsole, overrideDisplay);
+        public override void RaReply(string text, bool success, bool logToConsole, string overrideDisplay) => player.ReferenceHub.queryProcessor._sender.RaReply($"DISCORDINTEGRATION#{text}", success, logToConsole, overrideDisplay);
     }
 }

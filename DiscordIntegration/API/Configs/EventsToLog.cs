@@ -59,7 +59,7 @@ namespace DiscordIntegration.API.Configs
 
         public bool PlayerOpeningGenerator { get; private set; } = true;
 
-        public bool PlayerInsertingGeneratorTablet { get; private set; } = true;
+        public bool PlayerActivategGenerator { get; private set; } = true;
 
         public bool PlayerEjectingGeneratorTablet { get; private set; } = true;
 
@@ -101,7 +101,7 @@ namespace DiscordIntegration.API.Configs
 
         public bool ContainingScp106 { get; private set; } = true;
 
-        public bool CreatingScp106Portal { get; private set; } = true;
+        public bool Scp106Stalking { get; private set; } = true;
 
         public bool GainingScp079Experience { get; private set; } = true;
 

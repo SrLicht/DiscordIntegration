@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+
 namespace DiscordIntegration.Events
 {
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -14,7 +16,6 @@ namespace DiscordIntegration.Events
     using API.EventArgs.Network;
     using API.User;
     using Dependency;
-    using Exiled.API.Features;
     using Newtonsoft.Json;
     using static DiscordIntegration;
 
@@ -81,7 +82,7 @@ namespace DiscordIntegration.Events
             ev.Port = Instance.Config.Bot.Port;
             ev.ReconnectionInterval = TimeSpan.FromSeconds(Instance.Config.Bot.ReconnectionInterval);
 
-            Log.Warn($"[NET] {string.Format(Language.ConnectingTo, ev.IPAddress, ev.Port)}");
+            Log.Warning($"[NET] {string.Format(Language.ConnectingTo, ev.IPAddress, ev.Port)}");
         }
 
         /// <inheritdoc cref="API.Network.OnConnected(object, System.EventArgs)"/>
@@ -110,7 +111,7 @@ namespace DiscordIntegration.Events
             if (ev.Task.IsFaulted)
                 Log.Error($"[NET] {string.Format(Language.ServerHasBeenTerminatedWithErrors, Instance.Config.IsDebugEnabled ? ev.Task.Exception.ToString() : ev.Task.Exception.Message)}");
             else
-                Log.Warn($"[NET] {Language.ServerHasBeenTerminated}");
+                Log.Warning($"[NET] {Language.ServerHasBeenTerminated}");
 
             NetworkCancellationTokenSource.Cancel();
             NetworkCancellationTokenSource.Dispose();
