@@ -5,6 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using PluginAPI.Core;
+using PluginAPI.Core.Attributes;
+using PluginAPI.Enums;
+
 namespace DiscordIntegration.Events
 {
     using API.Commands;
@@ -19,18 +23,21 @@ namespace DiscordIntegration.Events
     {
 #pragma warning disable SA1600 // Elements should be documented
 
-        public async void OnReportingCheater(ReportingCheaterEventArgs ev)
+        [PluginEvent(ServerEventType.PlayerCheaterReport)]
+        public async void OnReportingCheater(Player issuer, Player target, string reason)
         {
             if (Instance.Config.EventsToLog.ReportingCheater)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Reports, string.Format(Language.CheaterReportFilled, ev.Issuer.Nickname, ev.Issuer.UserId, ev.Issuer.Role, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role, ev.Reason))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Reports, string.Format(Language.CheaterReportFilled, issuer.Nickname, issuer.UserId, issuer.Role, target.Nickname, target.UserId, target.Role, reason))).ConfigureAwait(false);
         }
 
-        public async void OnLocalReporting(LocalReportingEventArgs ev)
+        [PluginEvent(ServerEventType.PlayerReport)]
+        public async void OnLocalReporting(Player issuer, Player target, string reason)
         {
             if (Instance.Config.EventsToLog.ReportingCheater)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Reports, string.Format(Language.CheaterReportFilled, ev.Issuer.Nickname, ev.Issuer.UserId, ev.Issuer.Role, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role, ev.Reason))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Reports, string.Format(Language.CheaterReportFilled, issuer.Nickname, issuer.UserId, issuer.Role, target.Nickname, target.UserId, target.Role, reason))).ConfigureAwait(false);
         }
 
+        [PluginEvent(ServerEventType.WaitingForPlayers)]
         public async void OnWaitingForPlayers()
         {
             if (Instance.Config.EventsToLog.WaitingForPlayers)
@@ -38,23 +45,27 @@ namespace DiscordIntegration.Events
             if (Instance.Config.StaffOnlyEventsToLog.WaitingForPlayers)
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, Language.WaitingForPlayers)).ConfigureAwait(false);
         }
+        
 
+        [PluginEvent(ServerEventType.RoundStart)]
         public async void OnRoundStarted()
         {
             if (Instance.Config.EventsToLog.RoundStarted)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.RoundStarting, Player.Dictionary.Count))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.RoundStarting, Player.Count))).ConfigureAwait(false);
         }
 
-        public async void OnRoundEnded(RoundEndedEventArgs ev)
+        [PluginEvent(ServerEventType.RoundEnd)]
+        public async void OnRoundEnded(RoundSummary.LeadingTeam team)
         {
             if (Instance.Config.EventsToLog.RoundEnded)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.RoundEnded, ev.LeadingTeam, Player.Dictionary.Count, Instance.Slots))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.RoundEnded, team, Player.Count, Instance.Slots))).ConfigureAwait(false);
         }
 
-        public async void OnRespawningTeam(RespawningTeamEventArgs ev)
+        [PluginEvent(ServerEventType.TeamRespawnSelected)]
+        public async void OnRespawningTeam(SpawnableTeamType team)
         {
             if (Instance.Config.EventsToLog.RespawningTeam)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? Language.ChaosInsurgencyHaveSpawned : Language.NineTailedFoxHaveSpawned, ev.Players.Count))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(team == SpawnableTeamType.ChaosInsurgency ? Language.ChaosInsurgencyHaveSpawned : Language.NineTailedFoxHaveSpawned, "ev.Players.Count"))).ConfigureAwait(false);
         }
     }
 }
