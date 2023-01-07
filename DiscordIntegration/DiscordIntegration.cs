@@ -146,10 +146,11 @@ namespace DiscordIntegration
 
         private void RegisterEvents()
         {
-            mapHandler = new MapHandler();
-            serverHandler = new ServerHandler();
-            playerHandler = new PlayerHandler();
-            networkHandler = new NetworkHandler();
+            PluginAPI.Events.EventManager.RegisterEvents<Events.MapHandler>(this);
+            PluginAPI.Events.EventManager.RegisterEvents<Events.NetworkHandler>(this);
+            PluginAPI.Events.EventManager.RegisterEvents<Events.PlayerHandler>(this);
+            PluginAPI.Events.EventManager.RegisterEvents<Events.ServerHandler>(this);
+            PluginAPI.Events.EventManager.RegisterEvents<Events.VeryHelpful>(this);
 
             Network.SendingError += networkHandler.OnSendingError;
             Network.ReceivingError += networkHandler.OnReceivingError;
@@ -164,6 +165,12 @@ namespace DiscordIntegration
 
         private void UnregisterEvents()
         {
+            PluginAPI.Events.EventManager.UnregisterEvents<Events.MapHandler>(this);
+            PluginAPI.Events.EventManager.UnregisterEvents<Events.NetworkHandler>(this);
+            PluginAPI.Events.EventManager.UnregisterEvents<Events.PlayerHandler>(this);
+            PluginAPI.Events.EventManager.UnregisterEvents<Events.ServerHandler>(this);
+            PluginAPI.Events.EventManager.UnregisterEvents<Events.VeryHelpful>(this);
+            
             Network.SendingError -= networkHandler.OnSendingError;
             Network.ReceivingError -= networkHandler.OnReceivingError;
             Network.UpdatingConnectionError -= networkHandler.OnUpdatingConnectionError;
@@ -173,11 +180,6 @@ namespace DiscordIntegration
             Network.ReceivedFull -= networkHandler.OnReceivedFull;
             Network.Sent -= networkHandler.OnSent;
             Network.Terminated -= networkHandler.OnTerminated;
-
-            playerHandler = null;
-            mapHandler = null;
-            serverHandler = null;
-            networkHandler = null;
         }
     }
 }
