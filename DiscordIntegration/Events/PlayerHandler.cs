@@ -117,8 +117,13 @@ namespace DiscordIntegration.Events
         }
 
         [PluginEvent(ServerEventType.PlayerLeft)]
-        public async void OnDestroying(Player ply)
+        public async void OnLeft(Player ply)
         {
+            if (ply is not null)
+            {
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Disconnects, string.Format(Language.Disconnect, ply.Nickname, ply.UserId, ply.IpAddress))).ConfigureAwait(false);
+            }
+            
             if (Instance.Config.EventsToLog.PlayerLeft && (!ply.DoNotTrack || !Instance.Config.ShouldRespectDoNotTrack))
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.LeftServer, ply.Nickname, Instance.Config.ShouldLogUserIds ? ply.UserId : Language.Redacted, ply.Role))).ConfigureAwait(false);
             if (Instance.Config.StaffOnlyEventsToLog.PlayerLeft)

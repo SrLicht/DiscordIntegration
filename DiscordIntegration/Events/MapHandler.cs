@@ -95,7 +95,7 @@ namespace DiscordIntegration.Events
         }
 
         [PluginEvent(ServerEventType.Scp914UpgradeInventory)]
-        public async void OnUpgradingItemsInventory(Player ply, Scp914KnobSetting knobSetting, ItemBase item)
+        public async void OnUpgradingItemsInventory(Player ply, ItemBase item, Scp914KnobSetting knobSetting)
         {
             if (Instance.Config.EventsToLog.UpgradingScp914Items)
             {
@@ -104,7 +104,7 @@ namespace DiscordIntegration.Events
         }
         
         [PluginEvent(ServerEventType.Scp914PickupUpgraded)]
-        public async void OnUpgradingItemsPickup(ItemPickupBase item, Scp914KnobSetting knobSetting, Vector3 outPosition)
+        public async void OnUpgradingItemsPickup(ItemPickupBase item, Vector3 outPosition, Scp914KnobSetting knobSetting)
         {
             if (Instance.Config.EventsToLog.UpgradingScp914Items)
             {

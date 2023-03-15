@@ -95,6 +95,14 @@ public class Config
                                 LogType = LogType.Embed
                             },
                         },
+                        Disconects = new List<LogChannel>()
+                        {
+                            new()
+                            {
+                                Id = 0,
+                                LogType = LogType.Embed
+                            }
+                        }
                     }
                 }
             }

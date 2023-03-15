@@ -46,6 +46,8 @@ namespace DiscordIntegration
 #pragma warning disable CS1591
         public string UsedCommand { get; set; } = ":keyboard: {0} ({1}) [{2}] used command: {3} {4}";
 
+        public string Disconnect { get; set; } = ":arrow_left: **{0} ({1}) [{2}] has left the server.**";
+
         public string HasRunClientConsoleCommand { get; set; } = ":keyboard: {0} ({1}) [{2}] has run a client-console command: {3} {4}";
 
         public string NoPlayersOnline { get; set; } = "No players online.";

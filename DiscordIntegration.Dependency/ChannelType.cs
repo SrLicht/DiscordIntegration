@@ -8,6 +8,7 @@ namespace DiscordIntegration.Dependency
         Reports,
         StaffCopy,
         Errors,
-        Watchlist
+        Watchlist,
+        Disconnects,
     }
 }
