@@ -92,7 +92,7 @@ public class Bot
         try
         {
             Log.Debug(ServerNumber, nameof(OnReceived), $"Received data {ev.Data}", Config.Default.Debug);
-            RemoteCommand command = JsonConvert.DeserializeObject<RemoteCommand>(ev.Data)!;
+            var command = JsonConvert.DeserializeObject<RemoteCommand>(ev.Data)!;
             Log.Debug(ServerNumber, nameof(OnReceived), $"Received command {command.Action}.", Config.Default.Debug);
 
             switch (command.Action)
@@ -115,13 +115,12 @@ public class Bot
                     Log.Debug(ServerNumber, nameof(OnReceived), "Failed to add message to queue.");
                     break;
                 case ActionType.SendMessage:
-                    
-                    if (ulong.TryParse(command.Parameters[0].ToString(), out ulong chanId))
+                    if (ulong.TryParse(command.Parameters[0].ToString(), out var chanId))
                     {
-                        string[] split = command.Parameters[1].ToString()!.Split("|");
-                        await Guild.GetTextChannel(chanId).SendMessageAsync(embed: await EmbedBuilderService.CreateBasicEmbed($"Server {ServerNumber} | {split[0]}", split[1].TrimStart('|'), (bool)command.Parameters[2] ? Color.Green : Color.Red));
+                        var split = command.Parameters[1].ToString()!.Split("¶");
+                        await Guild.GetTextChannel(chanId).SendMessageAsync(embed: await EmbedBuilderService.CreateBasicEmbed($"Server {ServerNumber} | {split[0]}", split[1].TrimStart('¶'), (bool)command.Parameters[2] ? Color.Green : Color.Red));
                     }
-
+                    
                     break;
                 case ActionType.UpdateActivity:
                     string commandMessage = string.Empty;

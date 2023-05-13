@@ -60,7 +60,7 @@ namespace DiscordIntegration.API.Commands
         /// <inheritdoc cref="CommandSender.RaReply"/>
         public override async void RaReply(string text, bool success, bool logToConsole, string overrideDisplay)
         {
-            await Network.SendAsync(new RemoteCommand(ActionType.SendMessage, ChannelId, $"{Command}|{text.Substring(text.IndexOf('#') + 1)}", success));
+            await Network.SendAsync(new RemoteCommand(ActionType.SendMessage, ChannelId, $"{Command}¶{text.Substring(text.IndexOf('#') + 1)}", success));
         }
 
         /// <inheritdoc cref="CommandSender.Print"/>
