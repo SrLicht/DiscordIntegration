@@ -37,7 +37,7 @@ namespace DiscordIntegration
         /// <summary>
         /// Gets the <see cref="API.Network"/> instance.
         /// </summary>
-        public static Network Network { get; private set; }
+        public static Network Network { get; set; }
 
         /// <summary>
         /// Gets or sets the network <see cref="CancellationTokenSource"/> instance.
@@ -128,6 +128,13 @@ namespace DiscordIntegration
             Network = null;
         }
 
+        [PluginReload]
+        public void OnReloaded()
+        {
+            OnDisabled();
+            OnEnabled();
+        }
+
         private void RegisterEvents()
         {
 
@@ -138,6 +145,32 @@ namespace DiscordIntegration
             PluginAPI.Events.EventManager.RegisterEvents(this, new Events.ServerHandler(Instance));
             PluginAPI.Events.EventManager.RegisterEvents(this, new Events.VeryHelpful(Instance));
 
+            Network.SendingError += networkHandler.OnSendingError;
+            Network.ReceivingError += networkHandler.OnReceivingError;
+            Network.UpdatingConnectionError += networkHandler.OnUpdatingConnectionError;
+            Network.ConnectingError += networkHandler.OnConnectingError;
+            Network.Connected += networkHandler.OnConnected;
+            Network.Connecting += networkHandler.OnConnecting;
+            Network.ReceivedFull += networkHandler.OnReceivedFull;
+            Network.Sent += networkHandler.OnSent;
+            Network.Terminated += networkHandler.OnTerminated;
+        }
+
+        public void DisconnectNetwork()
+        {
+            Network.SendingError -= networkHandler.OnSendingError;
+            Network.ReceivingError -= networkHandler.OnReceivingError;
+            Network.UpdatingConnectionError -= networkHandler.OnUpdatingConnectionError;
+            Network.ConnectingError -= networkHandler.OnConnectingError;
+            Network.Connected -= networkHandler.OnConnected;
+            Network.Connecting -= networkHandler.OnConnecting;
+            Network.ReceivedFull -= networkHandler.OnReceivedFull;
+            Network.Sent -= networkHandler.OnSent;
+            Network.Terminated -= networkHandler.OnTerminated;
+        }
+
+        public void ReconnectNetwork()
+        {
             Network.SendingError += networkHandler.OnSendingError;
             Network.ReceivingError += networkHandler.OnReceivingError;
             Network.UpdatingConnectionError += networkHandler.OnUpdatingConnectionError;

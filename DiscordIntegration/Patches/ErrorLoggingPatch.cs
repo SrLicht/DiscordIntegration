@@ -9,31 +9,26 @@ using PluginAPI.Core;
 
 namespace DiscordIntegration.Patches
 {
-#pragma warning disable SA1118
-
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Reflection.Emit;
     using global::DiscordIntegration.Dependency;
-
     using HarmonyLib;
-
     using NorthwoodLib.Pools;
-
     using static HarmonyLib.AccessTools;
 
-    [HarmonyPatch(typeof(Log), nameof(Log.Error))]
-    public class LogErrorPatch
+    //[HarmonyPatch(typeof(Log), nameof(Log.Error), typeof(object))]
+    //[HarmonyPatch(typeof(Log), nameof(Log.Error), typeof(string))]
+    internal class ErrorLoggingPatch
     {
-        // I dont know transpilers so... yeah im bad in harmony 
-        public static void PostFix(string message, string prefix = null)
+        internal static void LogError(object message)
         {
             if (DiscordIntegration.Instance.Config.LogErrors)
                 _ = DiscordIntegration.Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Errors, message));
         }
-    }
-    
-    /*internal class ErrorLoggingPatch
-    {
+
+        internal static void LogError(object sender, DataReceivedEventArgs e) => LogError($"{sender}: {e.Data}");
+
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
@@ -47,7 +42,7 @@ namespace DiscordIntegration.Patches
             newInstructions.InsertRange(index, new CodeInstruction[]
             {
                 new (OpCodes.Dup),
-                new (OpCodes.Call, Method(typeof(ErrorLoggingPatch), nameof(LogError))),
+                new (OpCodes.Call, Method(typeof(ErrorLoggingPatch), nameof(LogError), new[] { typeof(object) })),
             });
 
             for (int z = 0; z < newInstructions.Count; z++)
@@ -55,11 +50,5 @@ namespace DiscordIntegration.Patches
 
             ListPool<CodeInstruction>.Shared.Return(newInstructions);
         }
-
-        private static void LogError(object message)
-        {
-            if (DiscordIntegration.Instance.Config.LogErrors)
-                _ = DiscordIntegration.Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Errors, message));
-        }
-    }*/
+    }
 }

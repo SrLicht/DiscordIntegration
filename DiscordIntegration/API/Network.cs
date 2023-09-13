@@ -192,7 +192,7 @@ namespace DiscordIntegration.API
 
                     if (counter >= 50)
                     {
-                        Log.Warning($"{nameof(SendAsync)}: Connection timed out.");
+                        Log.Warning($"{nameof(SendAsync)}: Connection timed out. IsDisposed: {isDisposed}");
                         Dispose();
 
                         return;
@@ -421,7 +421,16 @@ namespace DiscordIntegration.API
                 }
                 catch (Exception exception) when (exception.GetType() != typeof(OperationCanceledException))
                 {
-                    OnUpdatingConnectionError(this, new UpdatingConnectionErrorEventArgs(exception));
+                    if(exception != null)
+                    {
+                        OnUpdatingConnectionError(this, new UpdatingConnectionErrorEventArgs(exception));
+                    }
+                    else
+                    {
+                        OnUpdatingConnectionError(this, new UpdatingConnectionErrorEventArgs(exception));
+                        Log.Error($"Exception is null");
+                        Log.Error($"{exception.GetType()}");
+                    }
                 }
 
                 cancellationToken.Token.ThrowIfCancellationRequested();

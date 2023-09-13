@@ -25,6 +25,7 @@ namespace DiscordIntegration.Events
 {
     using System;
     using Dependency;
+    using PluginAPI.Events;
     using static DiscordIntegration;
 
     /// <summary>
@@ -319,7 +320,7 @@ namespace DiscordIntegration.Events
         }
 
         [PluginEvent(ServerEventType.PlayerRemoveHandcuffs)]
-        public async void OnRemovingHandcuffs(Player player, Player target)
+        public async void OnRemovingHandcuffs(Player player, Player target, bool state)
         {
             if (Instance.Config.EventsToLog.PlayerRemovingHandcuffs && ((!player.DoNotTrack && !target.DoNotTrack) || !Instance.Config.ShouldRespectDoNotTrack))
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.HasBeenFreedBy, target.Nickname, Instance.Config.ShouldLogUserIds ? target.UserId : Language.Redacted, target.Role, player.Nickname, Instance.Config.ShouldLogUserIds ? player.UserId : Language.Redacted, player.Role))).ConfigureAwait(false);
@@ -339,16 +340,17 @@ namespace DiscordIntegration.Events
         [PluginEvent(ServerEventType.PlayerKicked)]
         public async void OnKicked(Player target, ICommandSender issuer,  string reason)
         {
+
             if (Instance.Config.EventsToLog.PlayerBanned)
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, "kicks", string.Format(Language.WasKicked, target?.Nickname ?? Language.NotAuthenticated, target?.UserId ?? Language.NotAuthenticated, reason))).ConfigureAwait(false);
         }
 
-        [PluginEvent(ServerEventType.PlayerBanned)]
-        public async void OnBanned(Player target, ICommandSender issuer, string reason, long duration)  
+        [PluginEvent]
+        public async void OnBanned(PlayerBannedEvent ev)
         {
             if (Instance.Config.EventsToLog.PlayerBanned)
             {
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Bans, string.Format(Language.WasBannedBy, target.Nickname, target.UserId, issuer.LogName, reason, DateTime.Now.AddSeconds(duration)))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.Bans, string.Format(Language.WasBannedBy, ev.Player.Nickname, ev.Player.UserId, ev.Issuer.LogName, ev.Reason, DateTime.Now.AddSeconds(ev.Duration)))).ConfigureAwait(false);
             }
         }
 

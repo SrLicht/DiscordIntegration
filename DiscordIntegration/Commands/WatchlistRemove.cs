@@ -26,7 +26,7 @@ namespace DiscordIntegration.Commands
 
         public string[] Aliases { get; } = new[] { "wlr" };
 
-        public string Description { get; } = Language.WatchlistRemoveDescription;
+        public string Description { get; } = "Removes a user from the watchlist.";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

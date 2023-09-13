@@ -26,7 +26,7 @@ namespace DiscordIntegration.Commands
 
         public string[] Aliases { get; } = new[] { "wla" };
 
-        public string Description { get; } = Language.WatchlistAddDescription;
+        public string Description { get; } = "Add player to the watchlist to log when is connected to the server";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
