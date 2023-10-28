@@ -261,7 +261,7 @@ namespace DiscordIntegration.Events
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasTriggeredATeslaGate, ply.Nickname, ply.UserId, ply.Role))).ConfigureAwait(false);
         }
 
-        [PluginEvent]
+        //[PluginEvent]
         public async void OnHurting(PlayerDamageEvent ev)
         {
             if (Instance.Config.EventsToLog.HurtingPlayer && ev.Target != null && (ev.Player == null || !Instance.Config.ShouldLogFriendlyFireDamageOnly || ev.Player.Role.GetTeam() == ev.Target.Role.GetTeam()) && (!Instance.Config.ShouldRespectDoNotTrack || (ev.Player == null || (!ev.Player.DoNotTrack && !ev.Target.DoNotTrack))) && !Instance.Config.BlacklistedDamageTypes.Contains(Extensions.GetDamageType(ev.DamageHandler)) && (!Instance.Config.OnlyLogPlayerDamage || ev.Player != null))
@@ -270,7 +270,7 @@ namespace DiscordIntegration.Events
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasDamagedForWith, ev.Player != null ? ev.Player.Nickname : "Server", ev.Player != null ? ev.Player.UserId : string.Empty, ev.Player?.Role ?? RoleTypeId.None, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role, "NA", Extensions.GetDamageType(ev.DamageHandler)))).ConfigureAwait(false);
         }
 
-        [PluginEvent(ServerEventType.PlayerDeath)]
+        //[PluginEvent(ServerEventType.PlayerDeath)]
         public async void OnDying(Player target, Player killer, DamageHandlerBase damage)
         {
             if (Instance.Config.EventsToLog.PlayerDying && target != null && (killer == null || !Instance.Config.ShouldLogFriendlyFireKillsOnly || killer.Role.GetTeam() == target.Role.GetTeam()) && (!Instance.Config.ShouldRespectDoNotTrack || (killer == null || (!killer.DoNotTrack && !target.DoNotTrack))))

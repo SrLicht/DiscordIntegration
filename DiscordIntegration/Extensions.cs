@@ -16,6 +16,7 @@ namespace DiscordIntegration
     using System.Text.RegularExpressions;
     using API.Commands;
     using CommandSystem;
+    using PlayerRoles.PlayableScps.Scp3114;
 
     /// <summary>
     /// Useful Extension methods.
@@ -91,6 +92,9 @@ namespace DiscordIntegration
             { DeathTranslations.UsedAs106Bait.Id, DamageType.FemurBreaker },
             { DeathTranslations.MicroHID.Id, DamageType.MicroHid },
             { DeathTranslations.Hypothermia.Id, DamageType.Hypothermia },
+            { DeathTranslations.Scp3114Slap.Id, DamageType.Scp3114 },
+            { DeathTranslations.MarshmallowMan.Id, DamageType.MarshmallowMan },
+            { DeathTranslations.MetalPipe.Id, DamageType.MetalPipe },
         };
 
         private static readonly Dictionary<DeathTranslation, DamageType> TranslationConversionInternal = new()
@@ -109,6 +113,7 @@ namespace DiscordIntegration
             { DeathTranslations.Scp207, DamageType.Scp207 },
             { DeathTranslations.Scp939Lunge, DamageType.Scp939 },
             { DeathTranslations.Scp939Other, DamageType.Scp939 },
+            { DeathTranslations.Scp3114Slap, DamageType.Scp3114 },
             { DeathTranslations.Tesla, DamageType.Tesla },
             { DeathTranslations.Unknown, DamageType.Unknown },
             { DeathTranslations.Warhead, DamageType.Warhead },
@@ -120,6 +125,10 @@ namespace DiscordIntegration
             { DeathTranslations.UsedAs106Bait, DamageType.FemurBreaker },
             { DeathTranslations.MicroHID, DamageType.MicroHid },
             { DeathTranslations.Hypothermia, DamageType.Hypothermia },
+            // halloween update
+            { DeathTranslations.Scp3114Slap, DamageType.Scp3114 },
+            { DeathTranslations.MarshmallowMan, DamageType.MarshmallowMan },
+            { DeathTranslations.MetalPipe, DamageType.MetalPipe },
         };
 
         private static readonly Dictionary<ItemType, DamageType> ItemConversionInternal = new()
@@ -176,7 +185,6 @@ namespace DiscordIntegration
                             ? TranslationIdConversionInternal[translation.Id]
                             : DamageType.Scp;
                     }
-
                 case UniversalDamageHandler universal:
                     {
                         DeathTranslation translation = DeathTranslations.TranslationsById[universal.TranslationId];
@@ -394,5 +402,20 @@ namespace DiscordIntegration
         /// Damage caused by <see cref="ItemType.GunCom45"/>.
         /// </summary>
         Com45,
+
+        /// <summary>
+        /// Dmage caused by <see cref="RoleTypeId.Scp3114"/>
+        /// </summary>
+        Scp3114,
+
+        /// <summary>
+        /// Damage caused by a Marshmallow Man.
+        /// </summary>
+        MarshmallowMan,
+
+        /// <summary>
+        /// Damage caused by a Metal Pipe.
+        /// </summary>
+        MetalPipe,
     }
 }

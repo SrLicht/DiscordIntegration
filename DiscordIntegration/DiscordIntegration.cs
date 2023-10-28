@@ -72,6 +72,13 @@ namespace DiscordIntegration
         public void OnEnabled()
         {
             Instance = this;
+
+            if (!Config.IsEnabled)
+            {
+                Log.Warning("DiscordIntegration disabled by config");
+                return;
+            }
+
             try
             {
                 harmony = new Harmony($"com.joker.DI-{DateTime.Now.Ticks}");
