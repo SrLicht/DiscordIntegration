@@ -67,7 +67,7 @@ namespace DiscordIntegration
         /// <summary>
         /// Fired when the plugin is enabled.
         /// </summary>
-        [PluginEntryPoint("DiscordIntegration", "1.0.0", 
+        [PluginEntryPoint("DiscordIntegration", "1.0.1", 
             "server plugin to allow server logs to be sent to Discord channels, and for server commands to be run via the Discord bot.", "SrLicht")]
         public void OnEnabled()
         {
@@ -97,9 +97,9 @@ namespace DiscordIntegration
             _ = Network.Start(NetworkCancellationTokenSource);
             
             _ = Bot.UpdateActivity(Bot.UpdateActivityCancellationTokenSource.Token);
-            _ = Bot.UpdateChannelsTopic(Bot.UpdateChannelsTopicCancellationTokenSource.Token);
-            
-            Log.Debug($"Path of language is {Language.FullPath}");
+
+            if(Instance.Config.Bot.ChannelTopicUpdateInterval != -1)
+                _ = Bot.UpdateChannelsTopic(Bot.UpdateChannelsTopicCancellationTokenSource.Token);
         }
 
         /// <summary>

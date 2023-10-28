@@ -31,17 +31,19 @@ namespace DiscordIntegration.Commands
                 return false;
             }
 
-            Instance.DisconnectNetwork();
-            NetworkCancellationTokenSource.Cancel();
-            NetworkCancellationTokenSource.Dispose();
+            if (NetworkCancellationTokenSource != null)
+            {
+                NetworkCancellationTokenSource.Cancel();
+                NetworkCancellationTokenSource.Dispose();
+            }
+
             Network.Close();
-
-            NetworkCancellationTokenSource = new CancellationTokenSource();
+            Network = null;
             Network = new Network(Instance.Config.Bot.IPAddress, Instance.Config.Bot.Port, TimeSpan.FromSeconds(Instance.Config.Bot.ReconnectionInterval));
+            NetworkCancellationTokenSource = new CancellationTokenSource();
             _ = Network.Start(NetworkCancellationTokenSource);
-            Instance.ReconnectNetwork();
 
-            response = "Networking disposed and started a new one";
+            response = "Se creo un nuevo token y conexion con el servidor";
             return true;
         }
     }

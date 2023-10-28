@@ -228,6 +228,7 @@ namespace DiscordIntegration.API
         {
             if (shouldDisposeAllResources)
             {
+                TcpClient?.Close();
                 TcpClient?.Dispose();
                 TcpClient = null;
 

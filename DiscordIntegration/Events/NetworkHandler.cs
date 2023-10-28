@@ -113,6 +113,9 @@ namespace DiscordIntegration.Events
             else
                 Log.Warning($"[NET] {Language.ServerHasBeenTerminated}");
 
+            if (NetworkCancellationTokenSource.IsCancellationRequested)
+                return;
+
             NetworkCancellationTokenSource.Cancel();
             NetworkCancellationTokenSource.Dispose();
 
