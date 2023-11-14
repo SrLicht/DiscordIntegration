@@ -10,6 +10,7 @@ namespace DiscordIntegration
     using System.Collections.Generic;
     using System.ComponentModel;
     using API.Configs;
+    using global::DiscordIntegration.Extensions;
 
     /// <summary>
     /// Handles plugin configs.

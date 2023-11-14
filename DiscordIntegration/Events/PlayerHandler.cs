@@ -24,7 +24,9 @@ using UnityEngine;
 namespace DiscordIntegration.Events
 {
     using System;
+    using System.Linq;
     using Dependency;
+    using global::DiscordIntegration.Extensions.Extensions;
     using PluginAPI.Events;
     using static DiscordIntegration;
     using static UnityEngine.GraphicsBuffer;
@@ -261,23 +263,23 @@ namespace DiscordIntegration.Events
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasTriggeredATeslaGate, ply.Nickname, ply.UserId, ply.Role))).ConfigureAwait(false);
         }
 
-        //[PluginEvent]
+        [PluginEvent]
         public async void OnHurting(PlayerDamageEvent ev)
         {
-            if (Instance.Config.EventsToLog.HurtingPlayer && ev.Target != null && (ev.Player == null || !Instance.Config.ShouldLogFriendlyFireDamageOnly || ev.Player.Role.GetTeam() == ev.Target.Role.GetTeam()) && (!Instance.Config.ShouldRespectDoNotTrack || (ev.Player == null || (!ev.Player.DoNotTrack && !ev.Target.DoNotTrack))) && !Instance.Config.BlacklistedDamageTypes.Contains(Extensions.GetDamageType(ev.DamageHandler)) && (!Instance.Config.OnlyLogPlayerDamage || ev.Player != null))
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.HasDamagedForWith, ev.Player != null ? ev.Player.Nickname : "Server", Instance.Config.ShouldLogUserIds ? ev.Player != null ? ev.Player.UserId : string.Empty : Language.Redacted, ev.Player?.Role ?? RoleTypeId.None, ev.Target.Nickname, Instance.Config.ShouldLogUserIds ? ev.Target.UserId : Language.Redacted, ev.Target.Role, "NA", Extensions.GetDamageType(ev.DamageHandler)))).ConfigureAwait(false);
-            if (Instance.Config.StaffOnlyEventsToLog.HurtingPlayer && ev.Target != null && (ev.Player == null || !Instance.Config.ShouldLogFriendlyFireDamageOnly || ev.Player.Role.GetTeam() == ev.Target.Role.GetTeam()) && !Instance.Config.BlacklistedDamageTypes.Contains(Extensions.GetDamageType(ev.DamageHandler)) && (!Instance.Config.OnlyLogPlayerDamage || ev.Player != null))
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasDamagedForWith, ev.Player != null ? ev.Player.Nickname : "Server", ev.Player != null ? ev.Player.UserId : string.Empty, ev.Player?.Role ?? RoleTypeId.None, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role, "NA", Extensions.GetDamageType(ev.DamageHandler)))).ConfigureAwait(false);
+            if (Instance.Config.EventsToLog.HurtingPlayer && ev.Target != null && (ev.Player == null || !Instance.Config.ShouldLogFriendlyFireDamageOnly || ev.Player.Role.GetTeam() == ev.Target.Role.GetTeam()) && (!Instance.Config.ShouldRespectDoNotTrack || (ev.Player == null || (!ev.Player.DoNotTrack && !ev.Target.DoNotTrack))) && !Instance.Config.BlacklistedDamageTypes.Contains(DamageTypeExtensions.GetDamageType(ev.DamageHandler)) && (!Instance.Config.OnlyLogPlayerDamage || ev.Player != null))
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.HasDamagedForWith, ev.Player != null ? ev.Player.Nickname : "Server", Instance.Config.ShouldLogUserIds ? ev.Player != null ? ev.Player.UserId : string.Empty : Language.Redacted, ev.Player?.Role ?? RoleTypeId.None, ev.Target.Nickname, Instance.Config.ShouldLogUserIds ? ev.Target.UserId : Language.Redacted, ev.Target.Role, "NA", DamageTypeExtensions.GetDamageType(ev.DamageHandler)))).ConfigureAwait(false);
+            if (Instance.Config.StaffOnlyEventsToLog.HurtingPlayer && ev.Target != null && (ev.Player == null || !Instance.Config.ShouldLogFriendlyFireDamageOnly || ev.Player.Role.GetTeam() == ev.Target.Role.GetTeam()) && !Instance.Config.BlacklistedDamageTypes.Contains(DamageTypeExtensions.GetDamageType(ev.DamageHandler)) && (!Instance.Config.OnlyLogPlayerDamage || ev.Player != null))
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasDamagedForWith, ev.Player != null ? ev.Player.Nickname : "Server", ev.Player != null ? ev.Player.UserId : string.Empty, ev.Player?.Role ?? RoleTypeId.None, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role, "NA", DamageTypeExtensions.GetDamageType(ev.DamageHandler)))).ConfigureAwait(false);
         }
 
-        //[PluginEvent(ServerEventType.PlayerDeath)]
+        [PluginEvent(ServerEventType.PlayerDeath)]
         public async void OnDying(Player target, Player killer, DamageHandlerBase damage)
         {
             if (Instance.Config.EventsToLog.PlayerDying && target != null && (killer == null || !Instance.Config.ShouldLogFriendlyFireKillsOnly || killer.Role.GetTeam() == target.Role.GetTeam()) && (!Instance.Config.ShouldRespectDoNotTrack || (killer == null || (!killer.DoNotTrack && !target.DoNotTrack))))
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.HasKilledWith, killer != null ? killer.Nickname : "Server", Instance.Config.ShouldLogUserIds ? killer != null ? killer.UserId : string.Empty : Language.Redacted, killer?.Role ?? RoleTypeId.None, target.Nickname, Instance.Config.ShouldLogUserIds ? target.UserId : Language.Redacted, target.Role, Extensions.GetDamageType(damage)))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.HasKilledWith, killer != null ? killer.Nickname : "Server", Instance.Config.ShouldLogUserIds ? killer != null ? killer.UserId : string.Empty : Language.Redacted, killer?.Role ?? RoleTypeId.None, target.Nickname, Instance.Config.ShouldLogUserIds ? target.UserId : Language.Redacted, target.Role, DamageTypeExtensions.GetDamageType(damage)))).ConfigureAwait(false);
 
             if (Instance.Config.StaffOnlyEventsToLog.PlayerDying && target != null && (killer == null || !Instance.Config.ShouldLogFriendlyFireKillsOnly || killer.Role.GetTeam() == target.Role.GetTeam()))
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasKilledWith, killer != null ? killer.Nickname : "Server", killer != null ? killer.UserId : string.Empty, killer?.Role ?? RoleTypeId.None, target.Nickname, target.UserId, target.Role, Extensions.GetDamageType(damage)))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.StaffCopy, string.Format(Language.HasKilledWith, killer != null ? killer.Nickname : "Server", killer != null ? killer.UserId : string.Empty, killer?.Role ?? RoleTypeId.None, target.Nickname, target.UserId, target.Role, DamageTypeExtensions.GetDamageType(damage)))).ConfigureAwait(false);
         }
 
         [PluginEvent(ServerEventType.PlayerThrowItem)]
