@@ -65,6 +65,13 @@ namespace DiscordIntegration.Extensions
         }
     }
 
+    /// <summary>
+    /// Identifiers for types of damage.
+    /// </summary>
+    /// <seealso cref="Player.Hurt(float, DamageType, string)"/>
+    /// <seealso cref="Player.Hurt(Player, float, DamageType, Features.DamageHandlers.DamageHandlerBase.CassieAnnouncement)"/>
+    /// <seealso cref="Player.Hurt(Player, float, DamageType, Features.DamageHandlers.DamageHandlerBase.CassieAnnouncement, string)"/>
+    /// <seealso cref="Player.Kill(DamageType, string)"/>
     public enum DamageType
     {
         /// <summary>
@@ -283,21 +290,18 @@ namespace DiscordIntegration.Extensions
         A7,
 
         /// <summary>
-        /// Damage caused by <see cref="RoleTypeId.Scp3114"/>.
+        /// Damage caused by <see cref="RoleTypeId.Scp3114"/>
         /// </summary>
         Scp3114,
 
         /// <summary>
-        /// <see cref="EffectType.Strangled"/>.
+        /// Damage caused by Scp3114's strangling ability.
         /// </summary>
         Strangled,
 
-#pragma warning disable CS1591 // Commentaire XML manquant pour le type ou le membre visible publiquement
-#pragma warning disable SA1602 // Enumeration items should be documented
-        MarshmallowMan,
-        Silent,
-        MetalPipe,
-#pragma warning restore SA1602 // Enumeration items should be documented
-#pragma warning restore CS1591 // Commentaire XML manquant pour le type ou le membre visible publiquement
+        /// <summary>
+        /// Damage caused by the marshmallow man.
+        /// </summary>
+        Marshmallow,
     }
 }
