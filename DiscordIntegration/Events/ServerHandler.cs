@@ -12,6 +12,7 @@ using PluginAPI.Enums;
 namespace DiscordIntegration.Events
 {
     using Dependency;
+    using PluginAPI.Events;
     using Respawning;
     using static DiscordIntegration;
 
@@ -67,11 +68,11 @@ namespace DiscordIntegration.Events
                 await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(Language.RoundEnded, team, Player.Count, Instance.Slots))).ConfigureAwait(false);
         }
 
-        [PluginEvent(ServerEventType.TeamRespawnSelected)]
-        public async void OnRespawningTeam(SpawnableTeamType team)
+        [PluginEvent]
+        public async void OnRespawningTeam(TeamRespawnEvent ev)
         {
             if (Instance.Config.EventsToLog.RespawningTeam)
-                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(team == SpawnableTeamType.ChaosInsurgency ? Language.ChaosInsurgencyHaveSpawned : Language.NineTailedFoxHaveSpawned, "ev.Players.Count"))).ConfigureAwait(false);
+                await Network.SendAsync(new RemoteCommand(ActionType.Log, ChannelType.GameEvents, string.Format(ev.Team == SpawnableTeamType.ChaosInsurgency ? Language.ChaosInsurgencyHaveSpawned : Language.NineTailedFoxHaveSpawned, ev.Players.Count))).ConfigureAwait(false);
         }
     }
 }

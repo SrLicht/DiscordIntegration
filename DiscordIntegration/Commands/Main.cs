@@ -17,6 +17,8 @@ namespace DiscordIntegration.Commands
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal sealed class Main : ParentCommand
     {
+        public bool SanitizeResponse => true;
+
         public override string Command { get; } = "discordintegration";
 
         public override string[] Aliases { get; } = new[] { "di" };

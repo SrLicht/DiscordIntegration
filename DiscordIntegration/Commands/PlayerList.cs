@@ -21,6 +21,8 @@ namespace DiscordIntegration.Commands
     /// </summary>
     internal sealed class PlayerList : ICommand
     {
+        public bool SanitizeResponse => true;
+
         public static PlayerList Instance { get; } = new PlayerList();
 
         public string Command { get; } = "playerlist";

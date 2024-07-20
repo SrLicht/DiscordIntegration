@@ -41,7 +41,7 @@
     <Reference Include="UnityEngine.CoreModule" HintPath="$(SL_REFERENCES)\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(SL_REFERENCES)\UnityEngine.PhysicsModule.dll" Private="false" />
     <Reference Include="NorthwoodLib" HintPath="$(SL_REFERENCES)\NorthwoodLib.dll" Private="false" />
-    <Reference Include="NWAPIPermissionSystem" HintPath="$(SL_REFERENCES)\NWAPIPermissionSystem.dll" Private="false" />
+    <Reference Include="NWAPIPermissionSystem" HintPath="$(SL_PLUGINS_REFERENCES)\NWAPIPermissionSystem.dll" Private="false" />
   </ItemGroup>
 
 </Project>

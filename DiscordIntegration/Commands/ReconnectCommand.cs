@@ -14,6 +14,7 @@ namespace DiscordIntegration.Commands
 
     internal class ReconnectCommand : ICommand
     {
+        public bool SanitizeResponse => true;
         public static ReconnectCommand CInstance { get; } = new();
 
         public string Command { get; } = "reconnect";

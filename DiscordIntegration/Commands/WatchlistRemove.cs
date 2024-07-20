@@ -20,6 +20,7 @@ namespace DiscordIntegration.Commands
     /// </summary>
     internal sealed class WatchlistRemove : ICommand
     {
+        public bool SanitizeResponse => true;
         public static WatchlistRemove Instance { get; } = new WatchlistRemove();
 
         public string Command { get; } = "watchrem";

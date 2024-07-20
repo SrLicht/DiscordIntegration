@@ -15,7 +15,7 @@ public class VeryHelpful
     public static ushort GeneratorCount = 0;
     
     [PluginEvent(ServerEventType.MapGenerated)]
-    void OnGenerateMap()
+    internal void OnGenerateMap()
     {
         GeneratorCount = 0;
     }

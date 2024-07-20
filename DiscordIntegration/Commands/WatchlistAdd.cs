@@ -20,6 +20,7 @@ namespace DiscordIntegration.Commands
     /// </summary>
     internal sealed class WatchlistAdd : ICommand
     {
+        public bool SanitizeResponse => true;
         public static WatchlistAdd Instance { get; } = new WatchlistAdd();
 
         public string Command { get; } = "watchadd";
